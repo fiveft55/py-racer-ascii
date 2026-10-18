@@ -58,3 +58,9 @@ python3 -m unittest -v
 ```
 
 On Windows, use `py -3 -m unittest -v`. CI is configured for Linux and Windows.
+
+## Understand the code
+
+Read [How Dustline works — caveman edition](docs/HOW_IT_WORKS.md) for a
+beginner-friendly tour of every file, the game loop, road generation, drawing,
+and the Windows and Linux/macOS versions.

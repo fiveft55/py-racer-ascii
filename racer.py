@@ -70,7 +70,9 @@ class Race:
             self.vehicles.append(Vehicle(self.distance + self.rng.uniform(180, 260),
                                          self.rng.uniform(-0.66, 0.66),
                                          self.rng.uniform(18, 42), self.rng.random() < 0.55))
-            self.spawn_at = self.distance + 310
+            # Trigger checks look 240 m ahead: 380 - 240 = 140 m between spawns.
+            # Previously 70 m; doubling the gap halves cars and rivals alike.
+            self.spawn_at = self.distance + 380
         for vehicle in self.vehicles[:]:
             before = vehicle.distance - old
             vehicle.distance += vehicle.speed * dt

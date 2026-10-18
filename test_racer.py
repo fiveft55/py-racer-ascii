@@ -7,7 +7,9 @@ class RaceTests(unittest.TestCase):
     def test_renderer_draws_game_and_small_terminal_notice(self):
         screen = Mock()
         screen.getmaxyx.return_value = (24, 80)
-        with patch('racer.curses.color_pair', return_value=0):
+        screen.color_pair = lambda index: 0
+        screen.bold = 0
+        with patch('racer.time.monotonic', return_value=0):
             render(screen, Race(), False)
         drawn = ' '.join(call.args[2] for call in screen.addnstr.call_args_list)
         self.assertIn('D U S T L I N E', drawn)
@@ -17,6 +19,15 @@ class RaceTests(unittest.TestCase):
         screen.getmaxyx.return_value = (20, 60)
         render(screen, Race(), False)
         self.assertIn('Resize terminal', screen.addnstr.call_args.args[2])
+
+    def test_windows_renderer_without_curses(self):
+        import io
+        from racer_windows import WindowsScreen
+        screen = WindowsScreen()
+        with patch('racer.curses', None), patch('sys.stdout', new_callable=io.StringIO) as output:
+            render(screen, Race(), False)
+            self.assertIn('D U S T L I N E', output.getvalue())
+            self.assertIn('\x1b[', output.getvalue())
 
     def test_course_is_reproducible_and_varies(self):
         self.assertEqual(Race(12).road(500), Race(12).road(500))

@@ -111,12 +111,16 @@ def render(screen, race, paused):
         put(screen, 0, 0, 'Resize terminal to at least 72 columns x 24 rows. Q quits.')
         screen.refresh()
         return
-    green = curses.color_pair(1)
-    road_color = curses.color_pair(2)
-    danger = curses.color_pair(3)
-    gold = curses.color_pair(4)
+    color = getattr(screen, "color_pair", None) or curses.color_pair
+    bold = getattr(screen, "bold", None)
+    if bold is None:
+        bold = curses.A_BOLD
+    green = color(1)
+    road_color = color(2)
+    danger = color(3)
+    gold = color(4)
     horizon, bottom = 7, height - 6
-    put(screen, 0, 2, 'D U S T L I N E   /   PROCEDURAL ROAD WAR', gold | curses.A_BOLD)
+    put(screen, 0, 2, 'D U S T L I N E   /   PROCEDURAL ROAD WAR', gold | bold)
     put(screen, 1, 2, f'{race.speed * 3.6:3.0f} km/h   BIKE {race.health:3.0f}%   {race.distance / 1000:.2f} / 5.00 km   TIME {race.elapsed:5.1f}s')
     put(screen, 2, 2, f'{race.biome(race.distance)}   SEED {race.seed}   TAKEDOWNS {race.hits}', green)
     put(screen, 4, width // 2 - 15, '    /\\       /\\    /\\       /\\ ', green)
@@ -146,8 +150,8 @@ def render(screen, race, paused):
         x = int(center + vehicle.lane * (2 + depth * width * 0.33))
         put(screen, y, x - 1, 'o^o' if vehicle.rival else '[#]', danger)
     player_x = int(width / 2 + race.lane * (2 + width * 0.33))
-    put(screen, bottom - 1, player_x, 'O', gold | curses.A_BOLD)
-    put(screen, bottom, player_x - 1, '/A\\', gold | curses.A_BOLD)
+    put(screen, bottom - 1, player_x, 'O', gold | bold)
+    put(screen, bottom, player_x - 1, '/A\\', gold | bold)
     put(screen, height - 4, 2, race.message, danger if race.health < 30 else gold)
     put(screen, height - 3, 2, 'W/UP gas  S/DOWN brake  A/D or arrows steer  J/L punch  P pause  Q quit')
     if paused or race.done:
@@ -205,9 +209,8 @@ def main():
     parser.add_argument('--seed', type=int, default=1, help='procedural course seed (default: 1)')
     args = parser.parse_args()
     if curses is None:
-        parser.exit(1, 'Terminal support is missing. On Windows, run:\n'
-                    '  py -m pip install -r requirements.txt\n'
-                    'Then run: py racer.py\n')
+        parser.exit(1, 'Curses support is missing. On Windows, run: py -3 racer_windows.py\n'
+                    'On Linux/macOS, use a Python installation with curses support.\n')
     if not sys.stdin.isatty() or not sys.stdout.isatty():
         parser.exit(1, 'Run this game in an interactive terminal (PowerShell, Command Prompt, or Windows Terminal).\n')
     try:

@@ -1,2 +1,0 @@
-# Windows provides curses through this package; Linux/macOS use the standard library.
-windows-curses==2.4.1; sys_platform == "win32"

@@ -7,7 +7,7 @@ and damages your ride.
 
 ## Play
 
-Requires Python 3.10+ and a Linux/macOS terminal with at least **72 × 24** cells.
+Requires Python 3.10+ and a terminal with at least **72 × 24** cells.
 No external packages are needed on Linux/macOS.
 
 ```sh
@@ -15,8 +15,31 @@ python3 racer.py
 python3 racer.py --seed 42
 ```
 
-On Windows, install `windows-curses` with `py -m pip install windows-curses`,
-then run `py racer.py` in a compatible terminal. Windows has not been tested.
+### Windows 10 (PowerShell or Command Prompt)
+
+Install **64-bit Python 3.12** from python.org (enable the Python launcher during
+installation), then download/extract or clone this repository. Open PowerShell
+or Command Prompt in the project folder and run:
+
+```powershell
+py -3.12 -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+.venv\Scripts\python.exe racer.py
+```
+
+After setup, run **`play.bat`** from the project folder (or double-click it).
+It uses the local virtual environment, so PowerShell script activation and
+execution-policy changes are unnecessary. Windows Terminal is recommended;
+PowerShell and Command Prompt in the standard Windows console also work with
+`windows-curses`. Use a window at least 72 columns wide and 24 rows tall.
+Run in a terminal, rather than IDLE, an editor output panel, or redirected output.
+
+If `py` is unavailable, reinstall Python with the launcher enabled, or substitute
+`python` for `py -3.12` above after confirming `python --version` is 3.10 or newer.
+If pip reports no matching `windows-curses` wheel, use 64-bit Python 3.12 as above.
+
+The included Windows CI workflow runs the simulation and renderer smoke tests. Interactive Windows
+keyboard/display behavior still needs a manual check on a Windows machine.
 
 | Key | Action |
 | --- | --- |

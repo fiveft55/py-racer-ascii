@@ -1,8 +1,23 @@
 import unittest
-from racer import Race, Vehicle
+from unittest.mock import Mock, patch
+from racer import Race, Vehicle, render
 
 
 class RaceTests(unittest.TestCase):
+    def test_renderer_draws_game_and_small_terminal_notice(self):
+        screen = Mock()
+        screen.getmaxyx.return_value = (24, 80)
+        with patch('racer.curses.color_pair', return_value=0):
+            render(screen, Race(), False)
+        drawn = ' '.join(call.args[2] for call in screen.addnstr.call_args_list)
+        self.assertIn('D U S T L I N E', drawn)
+        self.assertIn('W/UP gas', drawn)
+        screen.refresh.assert_called_once()
+        screen.reset_mock()
+        screen.getmaxyx.return_value = (20, 60)
+        render(screen, Race(), False)
+        self.assertIn('Resize terminal', screen.addnstr.call_args.args[2])
+
     def test_course_is_reproducible_and_varies(self):
         self.assertEqual(Race(12).road(500), Race(12).road(500))
         self.assertNotEqual(Race(12).road(500), Race(13).road(500))

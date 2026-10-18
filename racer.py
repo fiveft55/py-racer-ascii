@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """Dustline: a dependency-free procedural terminal motorcycle racer."""
 import argparse
-import curses
+import sys
+try:
+    import curses
+except ImportError:
+    curses = None
 from dataclasses import dataclass
 import math
 import random
@@ -152,7 +156,10 @@ def render(screen, race, paused):
 
 
 def play(screen, seed):
-    curses.curs_set(0)
+    try:
+        curses.curs_set(0)
+    except curses.error:
+        pass
     screen.nodelay(True)
     screen.keypad(True)
     if curses.has_colors():
@@ -197,10 +204,19 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--seed', type=int, default=1, help='procedural course seed (default: 1)')
     args = parser.parse_args()
+    if curses is None:
+        parser.exit(1, 'Terminal support is missing. On Windows, run:\n'
+                    '  py -m pip install -r requirements.txt\n'
+                    'Then run: py racer.py\n')
+    if not sys.stdin.isatty() or not sys.stdout.isatty():
+        parser.exit(1, 'Run this game in an interactive terminal (PowerShell, Command Prompt, or Windows Terminal).\n')
     try:
         curses.wrapper(play, args.seed)
     except KeyboardInterrupt:
         pass
+    except curses.error as exc:
+        parser.exit(1, f'Terminal initialization failed: {exc}\n'
+                    'Use a terminal window at least 72 columns by 24 rows.\n')
 
 
 if __name__ == '__main__':
